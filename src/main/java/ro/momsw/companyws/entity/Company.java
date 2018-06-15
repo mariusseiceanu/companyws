@@ -1,7 +1,7 @@
-package com.example.companyws.entity;
+package ro.momsw.companyws.entity;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 public class Company {
@@ -26,8 +26,8 @@ public class Company {
 
     private String phoneNumber;
 
-    @OneToMany
-    private Set<Owner> beneficialOwners;
+    @ManyToMany(mappedBy = "companies")
+    private List<Owner> beneficialOwners;
 
     public long getId() {
         return id;
@@ -79,5 +79,14 @@ public class Company {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+
+    public List<Owner> getBeneficialOwners() {
+        return beneficialOwners;
+    }
+
+    public void setBeneficialOwners(List<Owner> beneficialOwners) {
+        this.beneficialOwners = beneficialOwners;
     }
 }

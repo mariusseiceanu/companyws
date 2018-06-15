@@ -1,6 +1,7 @@
-package com.example.companyws.entity;
+package ro.momsw.companyws.entity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Owner {
@@ -18,27 +19,47 @@ public class Owner {
     @Column(nullable = false)
     private String lastName;
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "company_beneficialowner",
+            joinColumns = @JoinColumn(name = "company_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "beneficialowner_id", referencedColumnName = "id"))
+    private List<Company> companies;
+
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
+
         this.email = email;
     }
 
     public String getFirstName() {
+
         return firstName;
     }
 
     public void setFirstName(String firstName) {
+
         this.firstName = firstName;
     }
 
     public String getLastName() {
+
         return lastName;
     }
 
     public void setLastName(String lastName) {
+
         this.lastName = lastName;
+    }
+
+
+    public List<Company> getCompanies() {
+        return companies;
+    }
+
+    public void setCompanies(List<Company> companies) {
+        this.companies = companies;
     }
 }
