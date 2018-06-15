@@ -23,6 +23,7 @@ public class Company {
     private String country;
 
     private String email;
+
     private String phoneNumber;
 
     @OneToMany
