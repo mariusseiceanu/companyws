@@ -51,15 +51,8 @@ public class CompanyRepositoryDocGenerator {
     }
 
     @Test
-    public void shouldReturnDocForEntryPoints() throws Exception {
-        this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk()).andDo(document("home"));
-        this.mockMvc.perform(get("/companies")).andDo(print()).andExpect(status().isOk()).andDo(document("companies"));
-        this.mockMvc.perform(get("/owners")).andDo(print()).andExpect(status().isOk()).andDo(document("owners"));
-    }
-
-    @Test
     public void shouldReturnDocForCreateCompany() throws Exception {
-        mockMvc.perform(post(companiesUrlTemplate).content(
+        mockMvc.perform(post(companiesUrlTemplate).contentType("application/json").content(
                 "{\"name\" : \"MOMENTUM SOFTWARE\",  \"address\" : \"Valea Frumoasei\", \"city\" : \"Sibiu\", \"country\" : \"Romania\", \"email\" : \"office@momentum-software.ro\", \"phoneNumber\" : \"+40\"}")).
                 andExpect(status().isCreated()).andExpect(header().string("Location", CoreMatchers.containsString("companies/"))).
                 andDo(document("company-create",
@@ -146,7 +139,7 @@ public class CompanyRepositoryDocGenerator {
 
         String location = mvcResult.getResponse().getHeader("Location");
 
-        mockMvc.perform(put(location).content(
+        mockMvc.perform(put(location).contentType("application/json").content(
                 "{  \"name\" : \"MOMENTUM SOFTWARE 2\",  \"address\" : \"Valea Frumoasei 10\", \"city\" : \"Sibiu 550310\", \"country\" : \"RO\", \"email\" : \"office2@momentum-software.ro\", \"phoneNumber\" : \"+401\"}")).
                 andExpect(status().isNoContent()).
                 andDo(document("company-update",

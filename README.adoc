@@ -21,12 +21,13 @@ In the sections below, for each service call we see a sample request and sample 
 
 === Entry Point for Services
 By accessing root context of the application via HTTP GET you get information about available services.
+
+==== Request
 [source,bash]
 ----
 $ curl 'http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/' -i -X GET
 ----
 
-==== Request
 [source,http,options="nowrap"]
 ----
 GET / HTTP/1.1
@@ -64,16 +65,19 @@ https://docs.spring.io/spring-boot/docs/2.1.0.BUILD-SNAPSHOT/reference/htmlsingl
 
 === Create Company
 To create a new company you should do a HTTP POST with a company information in JSON format.
+
+==== Request
 [source,bash]
 ----
 $ curl 'http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies' -i -X POST \
+    -H 'Content-Type: application/json;charset=UTF-8' \
     -d '{"name" : "MOMENTUM SOFTWARE",  "address" : "Valea Frumoasei", "city" : "Sibiu", "country" : "Romania", "email" : "office@momentum-software.ro", "phoneNumber" : "+40"}'
 ----
 
-==== Request
 [source,http,options="nowrap"]
 ----
 POST /companies HTTP/1.1
+Content-Type: application/json;charset=UTF-8
 Host: company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com
 Content-Length: 167
 
@@ -172,14 +176,16 @@ HTTP/1.1 404 Not Found
 === Update Company
 To update any attribute of an already created company you should do a HTTP PUT to company location with new values for attributes you want to update in JSON format. You can include in the request one or all company attributes.
 
-IMPORTANT: HTTP address will be the location of the company as it was returned in response of <<Create Company>> service.
+IMPORTANT: Target HTTP address will be the location of the company as it was returned in response of <<Create Company>> service.
 
+==== Request
 [source,bash]
 ----
-$ curl 'http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/1' -i -X PUT \
+$ curl 'http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/2' -i -X PUT \
+    -H 'Content-Type: application/json;charset=UTF-8' \
     -d '{  "name" : "MOMENTUM SOFTWARE 2",  "address" : "Valea Frumoasei 10", "city" : "Sibiu 550310", "country" : "RO", "email" : "office2@momentum-software.ro", "phoneNumber" : "+401"}'
 ----
-==== Request
+
 [source,http,options="nowrap"]
 ----
 PUT /companies/1 HTTP/1.1
@@ -315,8 +321,20 @@ To create a new owner you should do a HTTP POST with owner information in JSON f
 [source,bash]
 ----
 $ curl 'http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/owners' -i -X POST \
+    -H 'Content-Type: application/json;charset=UTF-8' \
     -d '{"email" : "marius.seiceanu@gmail.com",  "firstName" : "Marius", "lastName" : "Seiceanu"}'
 ----
+
+[source,http,options="nowrap"]
+----
+POST /owners HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Host: company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com
+Content-Length: 89
+
+{"email" : "marius.seiceanu@gmail.com",  "firstName" : "Marius", "lastName" : "Seiceanu"}
+----
+
 See below a detailed description of owner attributes which can be passed to the service.
 |===
 |Path|Type|Description
@@ -343,6 +361,7 @@ HTTP/1.1 201 Created
 Location: http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/owners/1
 
 ----
+
 If mandatory attributes are not specified (see table above) the company will not be created and service will return an error.
 
 === Add Beneficial Owner to a Company

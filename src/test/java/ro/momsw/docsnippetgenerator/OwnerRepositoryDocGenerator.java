@@ -50,7 +50,7 @@ public class OwnerRepositoryDocGenerator {
 
     @Test
     public void shouldCreateOwner() throws Exception {
-        mockMvc.perform(post(ownersUrlTemplate).content(
+        mockMvc.perform(post(ownersUrlTemplate).contentType("application/json").content(
                 "{\"email\" : \"marius.seiceanu@gmail.com\",  \"firstName\" : \"Marius\", \"lastName\" : \"Seiceanu\"}")).
                 andExpect(status().isCreated()).
                 andExpect(header().string("Location", containsString("owners/"))).
