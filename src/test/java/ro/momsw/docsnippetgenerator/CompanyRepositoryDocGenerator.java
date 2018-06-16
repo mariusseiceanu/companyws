@@ -160,7 +160,7 @@ public class CompanyRepositoryDocGenerator {
                 andExpect(status().isCreated());
 
         mockMvc.perform(post(companiesUrlTemplate).content(
-                "{\"name\" : \"MOMENTUM CONSULTING\",  \"address\" : \"Other Street\", \"city\" : \"Sibiu\", \"country\" : \"Romania\", \"email\" : \"office@momentum-consulting.ro\", \"phoneNumber\" : \"+40\"}")).
+                "{\"name\" : \"ABC\",  \"address\" : \"Other Street\", \"city\" : \"SB\", \"country\" : \"RO\", \"email\" : \"office@abc.com\", \"phoneNumber\" : \"+40\"}")).
                 andExpect(status().isCreated());
 
         mockMvc.perform(

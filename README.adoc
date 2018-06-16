@@ -7,17 +7,24 @@ endif::[]
 :icons: font
 :source-highlighter: prettify
 :project_id: companyws
-This document describes how to <<Consume REST Services, consume>> the REST services for managing a list of companies and their beneficial owners. 
-Beside consumming, the guide describe how to <<Install the Services on Your Environment,install and run>> the services locally on your computer.
+
+= REST API for Company List Management
+
+The API demonstrates how to create and consume REST services for managing a list of companies and their owners using https://spring.io[Spring] and https://en.wikipedia.org/wiki/HATEOAS[HATEOAS].
+Two @RepositoryRestResource are created for management of entities Company and Owner and relation between them. These repositories are extended with search functionality.
+
+toc::[]
+
+There are two options to use the services:
+
+1. **Directly use deployed services.** For demonstration purposes the services were deployed on http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com. You can directly consume the services using the `https://curl.haxx.se[curl]` sample commands from chapter <<How to Consume the REST Services>>.
+
+2. **Deploy services on your machine.** In this case you will build and deploy the services locally using steps from <<Deploy the Services on Your Environment>>. Since now the default address for accessing the services will be http://localhost:8080/ don't forget to replace the address if you use the sample `curl` commands below.
 
 [[initial]]
-toc::[]
-== Consume REST Services
-The applications provieds a set of REST services for managing a list of companies and their beneficial owners. Examples below are for `curl` but any other HTTP client can be used.
 
-For test purposes the services are hosted on http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com. If you install the application locally, default address for accessing the services will be http://localhost:8080/. In this case you should replace the sample addresses below to correspond with your host.
-
-In the sections below, for each service call we see a sample request and sample response with details.
+== How to Consume the REST Services
+A description containg the request and response is added for each service. Sample `curl` command is added for ease of use; just copy-paste into terminal and adapt the data to your needs. Of course, you can use any other HTTP client.
 
 === Entry Point for Services
 By accessing root context of the application via HTTP GET you get information about available services.
@@ -274,11 +281,11 @@ Content-Length: 1912
         }
       }
     }, {
-      "name" : "MOMENTUM CONSULTING",
+      "name" : "ABC",
       "address" : "Other Street",
-      "city" : "Sibiu",
-      "country" : "Romania",
-      "email" : "office@momentum-consulting.ro",
+      "city" : "SB",
+      "country" : "RO",
+      "email" : "office@abc.com",
       "phoneNumber" : "+40",
       "_links" : {
         "self" : {
@@ -452,7 +459,7 @@ Content-Length: 1283
 }
 ----
 
-== Install the Services on Your Environment
+== Deploy the Services on Your Environment
 This part briefly describes how to build and run the services on your machine. You can skip this part in case you only access the pre-installed services on http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com .
 
 === Prerequisites
@@ -511,13 +518,16 @@ INFO 9221 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomca
 INFO 9221 --- [           main] ro.momsw.companyws.CompanyWSApplication  : Started CompanyWSApplication in 7.571 seconds (JVM running for 8.037)
 ----
 
-Done. Now you can start using the services by calling them as described in <<Consume REST Services>>. If you use the sample `curl` commands don't forget the change the links to point to http://locahost:8080/ .
+Done. Now you can start using the services by calling them as described in <<How to Consume the REST Services>>. If you use the sample `curl` commands don't forget the change the links to point to http://locahost:8080/ .
 
-== Considerations on Security and Redundancy
+== Next Steps
 === Securing the Services
 As it can be seen, services can be freely accessed now. In a next step we should add authentication mechanism to restrict access only to authorized users.
 
 A good choise for this is using OAuth2 mechanism to reduce the complexity on the client and benefit of inhenrent limited access to service.
 
 === Make the Service Redundant (Increase Availability)
-In order to build a fault tolerant system and have high availability of the servies we should deploy on multiple containers (at least two). On top of this we put a load balancer (e.g. NGINX) so that we expose a single entry point to client and take care of session replication if our services will become RESTful. This architecture will also increase the scalability of the whole systems until the point where the bottleneck will be on persistence layer (DB).
+In order to build a fault tolerant system and have high availability of the servies we should deploy on multiple containers (at least two). On top of this we put a load balancer (e.g. NGINX) so that we expose a single entry point to client and take care of session replication if our services will become stateful. This architecture will also increase the scalability of the whole systems until the point where the bottleneck will be on persistence layer (DB).
+
+=== Client Application with Angular
+Development of client application is in progress https://github.com/mariusseiceanu/companybo-front[here]. This will demonstrate how to use the services using https://angular.io[Angular] framework
