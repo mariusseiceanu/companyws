@@ -1,14 +1,18 @@
+ifdef::env-github[]
+:imagesdir: foo/
+endif::[]
 :spring_version: current
 :toc:
+:toc-placement!:
 :icons: font
 :source-highlighter: prettify
 :project_id: companyws
 This document describes how to <<Consume REST Services, consume>> the REST services for managing a list of companies and their beneficial owners. 
 
-Beside consumming, the guide describe how to install and run the services locally on your computer.
+Beside consumming, the guide describe how to <<Install the Services on Your Environment,install and run>> the services locally on your computer.
 
 [[initial]]
-
+toc::[]
 == Consume REST Services
 The applications provieds a set of REST services for managing a list of companies and their beneficial owners. Examples below are for `curl` but any other HTTP client can be used.
 
@@ -167,7 +171,7 @@ HTTP/1.1 404 Not Found
 === Update Company
 To update any attribute of an already created company you should do a HTTP PUT to company location with new values for attributes you want to update in JSON format. You can include in the request one or all company attributes.
 
-NOTE: HTTP address will be the location of the company as it was returned in response of <<Create Company>> service.
+IMPORTANT: HTTP address will be the location of the company as it was returned in response of <<Create Company>> service.
 
 [source,bash]
 ----
