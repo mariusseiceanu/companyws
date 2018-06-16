@@ -1,9 +1,10 @@
 package ro.momsw.companyws.entity;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Entity
+@Table (name = "Owner")
 public class Owner {
 
     @Id
@@ -19,11 +20,8 @@ public class Owner {
     @Column(nullable = false)
     private String lastName;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "company_beneficialowner",
-            joinColumns = @JoinColumn(name = "company_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "beneficialowner_id", referencedColumnName = "id"))
-    private List<Company> companies;
+    @ManyToMany(mappedBy = "beneficialOwners")
+    private Set<Company> companies;
 
     public String getEmail() {
         return email;
@@ -55,11 +53,11 @@ public class Owner {
     }
 
 
-    public List<Company> getCompanies() {
+    public Set<Company> getCompanies() {
         return companies;
     }
 
-    public void setCompanies(List<Company> companies) {
+    public void setCompanies(Set<Company> companies) {
         this.companies = companies;
     }
 }
