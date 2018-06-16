@@ -530,4 +530,4 @@ A good choise for this is using OAuth2 mechanism to reduce the complexity on the
 In order to build a fault tolerant system and have high availability of the servies we should deploy on multiple containers (at least two). On top of this we put a load balancer (e.g. NGINX) so that we expose a single entry point to client and take care of session replication if our services will become stateful. This architecture will also increase the scalability of the whole systems until the point where the bottleneck will be on persistence layer (DB).
 
 === Client Application with Angular
-Development of client application is in progress https://github.com/mariusseiceanu/companybo-front[here]. This will demonstrate how to use the services using https://angular.io[Angular] framework
+Development of client application is in progress https://github.com/mariusseiceanu/companybo-front[here]. This will demonstrate how to use the services using https://angular.io[Angular] framework.
