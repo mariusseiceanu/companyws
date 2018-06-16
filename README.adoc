@@ -1,3 +1,490 @@
-= REST Web Service for Company List Management
+:spring_version: current
+:toc:
+:icons: font
+:source-highlighter: prettify
+:project_id: companyws
+This document describes how to <<Consume REST Services, consume>> the REST services for managing a list of companies and their beneficial owners. 
 
+Beside consumming, the guide describe how to install and run the services locally on your computer.
 
+[[initial]]
+
+== Consume REST Services
+The applications provieds a set of REST services for managing a list of companies and their beneficial owners. Examples below are for `curl` but any other HTTP client can be used.
+
+For test purposes the services are hosted on http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com. If you install the application locally, default address for accessing the services will be http://localhost:8080/. In this case you should replace the sample addresses below to correspond with your host.
+
+=== Entry Point for Services
+By accessing via HTTP GET the root context of the application you get information about available services.
+[source,bash]
+----
+$ curl 'http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/' -i -X GET
+----
+
+==== Request
+[source,http,options="nowrap"]
+----
+GET / HTTP/1.1
+Host: company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com
+
+----
+==== Response
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/hal+json;charset=UTF-8
+Content-Length: 466
+
+{
+  "_links" : {
+    "owners" : {
+      "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/owners{?page,size,sort}",
+      "templated" : true
+    },
+    "companies" : {
+      "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies{?page,size,sort}",
+      "templated" : true
+    },
+    "profile" : {
+      "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/profile"
+    }
+  }
+}
+----
+
+We see in this response that we have two sets of services, one for managenent of `/companies` and one for management of `/owners`.
+
+`/profile` serves for application profiling, we will not go into details of this service in this document. For more information see 
+https://docs.spring.io/spring-boot/docs/2.1.0.BUILD-SNAPSHOT/reference/htmlsingle/#production-ready[Sprint Boot Actuator]
+
+=== Create Company
+To create a new company you should do a HTTP POST with a company information in JSON format.
+[source,bash]
+----
+$ curl 'http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies' -i -X POST \
+    -d '{"name" : "MOMENTUM SOFTWARE",  "address" : "Valea Frumoasei", "city" : "Sibiu", "country" : "Romania", "email" : "office@momentum-software.ro", "phoneNumber" : "+40"}'
+----
+
+==== Request
+[source,http,options="nowrap"]
+----
+POST /companies HTTP/1.1
+Host: company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com
+Content-Length: 167
+
+{"name" : "MOMENTUM SOFTWARE",  "address" : "Valea Frumoasei", "city" : "Sibiu", "country" : "Romania", "email" : "office@momentum-software.ro", "phoneNumber" : "+40"}
+----
+
+See below a detailed description of company attributes which can be passed to the service.
+|===
+|Path|Type|Description
+
+|`+name+`
+|`+String+`
+|Company name (mandatory)
+
+|`+address+`
+|`+String+`
+|Address of the company (mandatory)
+
+|`+city+`
+|`+String+`
+|City where company is located (mandatory)
+
+|`+country+`
+|`+String+`
+|Country where company is located (mandatory)
+
+|`+email+`
+|`+String+`
+|Email where company can be contacted
+
+|`+phoneNumber+`
+|`+String+`
+|Phone number where company can be contacted
+
+|===
+
+==== Response
+In case of success, the service will send us back the location where we can access created company. Remark the important part of the link `/companies/1` - this identifies the created company.
+
+[source,http,options="nowrap"]
+----
+HTTP/1.1 201 Created
+Location: http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/1
+
+----
+
+If mandatory attributes are not specified (see table above) the company will not be created and service will return an error.
+
+=== Get Details of a Company
+To obtain details of a company you should do a HTTP GET on the HTTP location of the company. This is returned in response of <<Create Company>> service.
+
+==== Request
+[source,bash]
+----
+$ curl 'http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/1' -i -X GET
+----
+==== Response
+Service will return the details of company in JSON format together with links for related services. 
+
+IMPORTANT: An important link is found under section `beneficialOwners'. This allow management of list of beneficial owners of this company.
+
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/hal+json;charset=UTF-8
+Content-Length: 591
+
+{
+  "name" : "MOMENTUM SOFTWARE",
+  "address" : "Valea Frumoasei",
+  "city" : "Sibiu",
+  "country" : "Romania",
+  "email" : "office@momentum-software.ro",
+  "phoneNumber" : "+40",
+  "_links" : {
+    "self" : {
+      "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/1"
+    },
+    "company" : {
+      "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/1"
+    },
+    "beneficialOwners" : {
+      "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/1/beneficialOwners"
+    }
+  }
+}
+----
+
+In case you request a company that does not exist, the service will return HTTP code 404 and empty response body.
+[source,http,options="nowrap"]
+----
+HTTP/1.1 404 Not Found
+
+----
+
+=== Update Company
+To update any attribute of an already created company you should do a HTTP PUT to company location with new values for attributes you want to update in JSON format. You can include in the request one or all company attributes.
+
+NOTE: HTTP address will be the location of the company as it was returned in response of <<Create Company>> service.
+
+[source,bash]
+----
+$ curl 'http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/1' -i -X PUT \
+    -d '{  "name" : "MOMENTUM SOFTWARE 2",  "address" : "Valea Frumoasei 10", "city" : "Sibiu 550310", "country" : "RO", "email" : "office2@momentum-software.ro", "phoneNumber" : "+401"}'
+----
+==== Request
+[source,http,options="nowrap"]
+----
+PUT /companies/1 HTTP/1.1
+Host: company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com
+Content-Length: 178
+
+{  "name" : "MOMENTUM SOFTWARE 2",  "address" : "Valea Frumoasei 10", "city" : "Sibiu 550310", "country" : "RO", "email" : "office2@momentum-software.ro", "phoneNumber" : "+401"}
+----
+See below a detailed description of company attributes which can be passed to the service. Since we do an update, mandatory attributes of create company are optional now.
+|===
+|Path|Type|Description
+
+|`+name+`
+|`+String+`
+|Company name
+
+|`+address+`
+|`+String+`
+|Address of the company
+
+|`+city+`
+|`+String+`
+|City where company is located
+
+|`+country+`
+|`+String+`
+|Country where company is located
+
+|`+email+`
+|`+String+`
+|Email where company can be contacted
+
+|`+phoneNumber+`
+|`+String+`
+|Phone number where company can be contacted
+
+|===
+
+==== Response
+In case of success, the response body will return HTTP code 204, response will ne empty, and location will contain the address of update compoany.
+[source,http,options="nowrap"]
+----
+HTTP/1.1 204 No Content
+Location: http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/1
+
+----
+
+=== Get the List of Companies
+To retrieve the list of companies you should to a HTTP GET on service address, as in the example below.
+
+==== Request
+
+[source,bash]
+----
+$ curl 'http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies' -i -X GET
+----
+==== Response
+Response will be in JSON format and will consist in a list of first 20 companies (default value), information related to complete list and links to this service and related services.
+
+NOTE: List allows customizable pagination of retrieved results.
+
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/hal+json;charset=UTF-8
+Content-Length: 1912
+
+{
+  "_embedded" : {
+    "companies" : [ {
+      "name" : "MOMENTUM SOFTWARE",
+      "address" : "Valea Frumoasei",
+      "city" : "Sibiu",
+      "country" : "Romania",
+      "email" : "office@momentum-software.ro",
+      "phoneNumber" : "+40",
+      "_links" : {
+        "self" : {
+          "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/1"
+        },
+        "company" : {
+          "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/1"
+        },
+        "beneficialOwners" : {
+          "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/1/beneficialOwners"
+        }
+      }
+    }, {
+      "name" : "MOMENTUM CONSULTING",
+      "address" : "Other Street",
+      "city" : "Sibiu",
+      "country" : "Romania",
+      "email" : "office@momentum-consulting.ro",
+      "phoneNumber" : "+40",
+      "_links" : {
+        "self" : {
+          "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/2"
+        },
+        "company" : {
+          "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/2"
+        },
+        "beneficialOwners" : {
+          "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/2/beneficialOwners"
+        }
+      }
+    } ]
+  },
+  "_links" : {
+    "self" : {
+      "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies{?page,size,sort}",
+      "templated" : true
+    },
+    "profile" : {
+      "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/profile/companies"
+    },
+    "search" : {
+      "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/search"
+    }
+  },
+  "page" : {
+    "size" : 20,
+    "totalElements" : 2,
+    "totalPages" : 1,
+    "number" : 0
+  }
+}
+----
+
+=== Create Owner
+To create a new owner you should do a HTTP POST with owner information in JSON format.
+
+==== Request
+[source,bash]
+----
+$ curl 'http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/owners' -i -X POST \
+    -d '{"email" : "marius.seiceanu@gmail.com",  "firstName" : "Marius", "lastName" : "Seiceanu"}'
+----
+See below a detailed description of owner attributes which can be passed to the service.
+|===
+|Path|Type|Description
+
+|`+email+`
+|`+String+`
+|Owner email address (mandatory, unique)
+
+|`+firstName+`
+|`+String+`
+|User first name (mandatory)
+
+|`+lastName+`
+|`+String+`
+|User last name (mandatory)
+
+|===
+==== Response
+In case of success, the service will send us back the location where we can access created owner. Remark the important part of the link /owners/1 - this identifies the created owner.
+
+[source,http,options="nowrap"]
+----
+HTTP/1.1 201 Created
+Location: http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/owners/1
+
+----
+If mandatory attributes are not specified (see table above) the company will not be created and service will return an error.
+
+=== Add Beneficial Owner to a Company
+To add a beneficial owner to a company you should do a HTTP POST to location company beneficialOwners` (see <<Get Details of a Company>>) and sned one or more URI references to exiting owners, references which are returned by <<Create Owner>> service. This time content type of request body will be `text/uri-list`.
+
+==== Request
+[source,bash]
+----
+$ curl 'http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/1/beneficialOwners' -i -X POST \
+    -H 'Content-Type: text/uri-list;charset=UTF-8' \
+    -d 'http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/owners/2'
+----
+
+[source,http,options="nowrap"]
+----
+POST /companies/1/beneficialOwners HTTP/1.1
+Content-Type: text/uri-list;charset=UTF-8
+Host: company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com
+Content-Length: 77
+
+http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/owners/2
+----
+
+==== Response
+Service will return an empty response body and HTTP code 204.
+
+[source,http,options="nowrap"]
+----
+HTTP/1.1 204 No Content
+
+----
+
+=== Get Beneficial Owners of Company
+To retrieve the list of beneficial owners of a company you need to do a HTTP GET on the location of company beneficial owners returned in response of <<Get Details of a Company>> service.
+
+==== Request
+[source,bash]
+----
+$ curl 'http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/1/beneficialOwners' -i -X GET
+----
+==== Response
+Response consists in a JSON formatted text that contains the list of company owners and related service links. Example below.
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/hal+json;charset=UTF-8
+Content-Length: 1283
+
+{
+  "_embedded" : {
+    "owners" : [ {
+      "email" : "marius.seiceanu@gmail.com",
+      "firstName" : "Marius",
+      "lastName" : "Seiceanu",
+      "_links" : {
+        "self" : {
+          "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/owners/2"
+        },
+        "owner" : {
+          "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/owners/2"
+        },
+        "companies" : {
+          "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/owners/2/companies"
+        }
+      }
+    }, {
+      "email" : "marius.oancea@gmail.com",
+      "firstName" : "Marius",
+      "lastName" : "Oancea",
+      "_links" : {
+        "self" : {
+          "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/owners/3"
+        },
+        "owner" : {
+          "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/owners/3"
+        },
+        "companies" : {
+          "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/owners/3/companies"
+        }
+      }
+    } ]
+  },
+  "_links" : {
+    "self" : {
+      "href" : "http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/companies/1/beneficialOwners"
+    }
+  }
+}
+----
+
+== Install the Services on Your Environment
+This part briefly describes how to build and run the services on your machine. You can skip this part in case you only access the pre-installed services on http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com .
+
+=== Prerequisites
+The following aplications are needed to be installed before you continue.
+
+ * http://www.oracle.com/technetwork/java/javase/downloads/index.html[JDK 8] or later
+ * https://maven.apache.org/download.cgi[Maven 3.2+]
+ * https://spring.io/understanding/Git[Git] - only in case you want to clone the repository instead of downloading the sources as zip.
+
+=== Get the source code
+https://github.com/mariusseiceanu/companyws/archive/master.zip[Download] and unzip the source repository or clone it using Git: 
+
+[source,bash]
+----
+git clone https://github.com/mariusseiceanu/companyws
+cd companyws
+----
+
+=== Build and package the application
+Run Maven package task:
+[source,bash]
+----
+mvn clean package
+----
+
+After some seconds you should see in console a successfull message like the one below:
+
+[source,console]
+----
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 23, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- maven-jar-plugin:3.0.2:jar (default-jar) @ companyws ---
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:2.0.3.RELEASE:repackage (default) @ companyws ---
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+----
+
+=== Run the application
+Previous step created a `JAR` package containing our service set. To start it you should execute:
+[source,bash]
+----
+java -jar target/companyws-0.0.1-SNAPSHOT.jar
+----
+
+After some seconds you will see in console
+
+[source,bash]
+----
+INFO 9221 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+INFO 9221 --- [           main] ro.momsw.companyws.CompanyWSApplication  : Started CompanyWSApplication in 7.571 seconds (JVM running for 8.037)
+----
+
+Done. Now you can start using the services by calling them as described in <<Consume REST Services>>. If you use the sample `curl` commands don't forget the change the links to point to http://locahost:8080/ .
