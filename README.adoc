@@ -448,7 +448,7 @@ https://github.com/mariusseiceanu/companyws/archive/master.zip[Download] and unz
 
 [source,bash]
 ----
-git clone https://github.com/mariusseiceanu/companyws
+git clone https://github.com/mariusseiceanu/companyws.git
 cd companyws
 ----
 
