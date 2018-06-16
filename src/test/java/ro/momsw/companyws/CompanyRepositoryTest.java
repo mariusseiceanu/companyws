@@ -190,7 +190,7 @@ public class CompanyRepositoryTest {
         String ownerRESTLocation = ownerMVCResult.getResponse().getHeader("Location");
 
         //add beneficial owner to the company
-        mockMvc.perform(put(companyBeneficialOwnersRESTLocation).contentType("text/uri-list").content(ownerRESTLocation));
+        mockMvc.perform(post(companyBeneficialOwnersRESTLocation).contentType("text/uri-list").content(ownerRESTLocation));
 
         mockMvc.perform(get(companyBeneficialOwnersRESTLocation)).andExpect(status().isOk()).
                 andExpect(jsonPath("$._embedded.owners[0].firstName").value("Marius")).

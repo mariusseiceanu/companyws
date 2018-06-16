@@ -1,6 +1,7 @@
 package ro.momsw.companyws.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Entity
@@ -11,12 +12,15 @@ public class Owner {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+    @Size(min = 1)
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Size(min = 1)
     @Column(nullable = false)
     private String firstName;
 
+    @Size(min = 1)
     @Column(nullable = false)
     private String lastName;
 

@@ -54,28 +54,28 @@ public class OwnerRepositoryTest {
     }
 
     @Test
-    public void shouldCreateOwnerWithoutEmail() throws Exception {
+    public void shouldNotCreateOwnerWithoutEmail() throws Exception {
         mockMvc.perform(post(ownersUrlTemplate).content(
                 "{\"firstName\" : \"Marius\", \"lastName\" : \"Seiceanu\"}")).
                 andExpect(status().isConflict());
     }
 
     @Test
-    public void shouldCreateOwnerWithoutFirstName() throws Exception {
+    public void shouldNotCreateOwnerWithoutFirstName() throws Exception {
         mockMvc.perform(post(ownersUrlTemplate).content(
                 "{\"email\" : \"marius.seiceanu@gmail.com\", \"lastName\" : \"Seiceanu\"}")).
                 andExpect(status().isConflict());
     }
 
     @Test
-    public void shouldCreateOwnerWithoutLastName() throws Exception {
+    public void shouldNotCreateOwnerWithoutLastName() throws Exception {
         mockMvc.perform(post(ownersUrlTemplate).content(
                 "{\"email\" : \"marius.seiceanu@gmail.com\", \"firstName\" : \"Marius\"}")).
                 andExpect(status().isConflict());
     }
 
     @Test
-    public void shouldCreateOwnerWithExistingEmail() throws Exception {
+    public void shouldNotCreateOwnerWithExistingEmail() throws Exception {
         //first user is created
         mockMvc.perform(post(ownersUrlTemplate).content(
                 "{\"email\" : \"marius.seiceanu@gmail.com\",  \"firstName\" : \"Marius\", \"lastName\" : \"Seiceanu\"}")).
