@@ -8,7 +8,6 @@ endif::[]
 :source-highlighter: prettify
 :project_id: companyws
 This document describes how to <<Consume REST Services, consume>> the REST services for managing a list of companies and their beneficial owners. 
-
 Beside consumming, the guide describe how to <<Install the Services on Your Environment,install and run>> the services locally on your computer.
 
 [[initial]]
