@@ -17,8 +17,10 @@ The applications provieds a set of REST services for managing a list of companie
 
 For test purposes the services are hosted on http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com. If you install the application locally, default address for accessing the services will be http://localhost:8080/. In this case you should replace the sample addresses below to correspond with your host.
 
+In the sections below, for each service call we see a sample request and sample response with details.
+
 === Entry Point for Services
-By accessing via HTTP GET the root context of the application you get information about available services.
+By accessing root context of the application via HTTP GET you get information about available services.
 [source,bash]
 ----
 $ curl 'http://company-bo-companybo.1d35.starter-us-east-1.openshiftapps.com/' -i -X GET
@@ -491,3 +493,12 @@ INFO 9221 --- [           main] ro.momsw.companyws.CompanyWSApplication  : Start
 ----
 
 Done. Now you can start using the services by calling them as described in <<Consume REST Services>>. If you use the sample `curl` commands don't forget the change the links to point to http://locahost:8080/ .
+
+== Considerations on Security and Redundancy
+=== Securing the Services
+As it can be seen, services can be freely accessed now. In a next step we should add authentication mechanism to restrict access only to authorized users.
+
+A good choise for this is using OAuth2 mechanism to reduce the complexity on the client and benefit of inhenrent limited access to service.
+
+=== Make the Service Redundant (Increase Availability)
+In order to build a fault tolerant system and have high availability of the servies we should deploy on multiple containers (at least two). On top of this we put a load balancer (e.g. NGINX) so that we expose a single entry point to client and take care of session replication if our services will become RESTful. This architecture will also increase the scalability of the whole systems until the point where the bottleneck will be on persistence layer (DB).
