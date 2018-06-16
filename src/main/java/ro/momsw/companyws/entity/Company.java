@@ -92,7 +92,6 @@ public class Company {
         this.phoneNumber = phoneNumber;
     }
 
-
     public Set<Owner> getBeneficialOwners() {
         return beneficialOwners;
     }

@@ -10,6 +10,6 @@ class GlobalControllerExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(javax.persistence.RollbackException.class)
     public void handleConflict() {
-        System.out.println();
+        //nothing to do. HTTP 500 will be sent as 409
     }
 }

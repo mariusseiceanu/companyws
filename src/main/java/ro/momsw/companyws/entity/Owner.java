@@ -52,7 +52,6 @@ public class Owner {
         this.lastName = lastName;
     }
 
-
     public Set<Company> getCompanies() {
         return companies;
     }
